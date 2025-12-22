@@ -1,0 +1,47 @@
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: node_api
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - mariadb_pelitili
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    restart: unless-stopped
+    networks:
+      - database-connection
+
+  mariadb_pelitili:
+    image: mariadb:11
+    container_name: mariadb_pelitili
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
+    expose:
+      - 3306
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - database-connection
+
+networks:
+  database-connection: 
+    name: 'database-connection'
+
+volumes:
+  mariadb_data:
