@@ -26,11 +26,12 @@ CREATE TABLE IF NOT EXISTS game_events (
         ON DELETE CASCADE
 );
 
-INSERT INTO players (name, balance)
+INSERT INTO players (player_id, name, balance)
 VALUES ('550e8400-e29b-41d4-a716-446655440000', 'Matti Meikäläinen', 50.00);
 
-INSERT INTO game_events (event_uuid, player_id, event_type, amount)
+INSERT INTO game_events (event_id, event_uuid, player_id, event_type, amount)
 VALUES (
+    UUID(),
     UUID(),
     '550e8400-e29b-41d4-a716-446655440000',
     'win',
