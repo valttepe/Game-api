@@ -11,6 +11,9 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
+// Parse URL-encoded bodies (HTML forms)
+app.use(express.urlencoded({ extended: true }));
+
 // Routes
 app.use('/api/game-events', gameEventRoutes);
 
