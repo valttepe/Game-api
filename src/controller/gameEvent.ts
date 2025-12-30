@@ -4,11 +4,6 @@ import { addGameEvent, getCurrentBalance, getGameEventsDB, updatePlayerBalance }
 import { BalanceResponse, GameEvent } from '../types';
 import { PoolConnection } from 'mariadb/*';
 
-// Only for testing purposes
-const getRandomUUID = () => {
-    return crypto.randomUUID();
-}
-
 export const getGameEvents = async (req: Request, res: Response): Promise<void> => {
 
     let conn;
@@ -38,24 +33,36 @@ export const putGameEvent = async (req: Request, res: Response): Promise<Respons
     try {
         conn = await pool.getConnection();
         conn.beginTransaction()
+        // Check Balance
         const currentBalance = await getCurrentBalance(conn, gameEvent.playerId);
-        console.log('Balance', currentBalance);
-        if (Number(currentBalance.balance) < Number(gameEvent.amount)) {
+        // Send message if there isn't enough money to play
+        if (checkIfPlayerHasMoney(currentBalance, gameEvent)) {
             return res.json({ status: 200, message: 'You are poor :)' });
         }
-
+        // Create game event 
         const game = await addGameEvent(conn, gameEvent);
+
+        // Update Balance
         const updatedBalance = await updatePlayerBalance(conn, gameEvent);
+
+        // Commit transaction 
+        await conn.commit();
+        const responseBalance = await getCurrentBalance(conn, gameEvent.playerId);
+        // Send information back to user
+        const response: BalanceResponse = { eventId: gameEvent.eventId, balance: responseBalance.balance }
+
+        return res.json(response)
     } catch (error) {
         console.error('Error occured', error)
+        if (conn) await conn.rollback();
         return res.json({ status: 500, message: 'Something went wrong' });
     } finally {
         if (conn) conn.release();
     }
-
-    // Return current balance as an response
-
-    console.log('details', gameEvent)
-    const response: BalanceResponse = { eventId: gameEvent.eventId, balance: '200' }
-    return res.json(response)
 }
+function checkIfPlayerHasMoney(currentBalance: Balance, gameEvent: GameEvent) {
+    return gameEvent.eventType == 'purchase'
+        ? Number(currentBalance.balance) < Number(gameEvent.amount)
+        : false;
+}
+
