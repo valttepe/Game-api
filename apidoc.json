@@ -1,0 +1,5 @@
+{
+    "name": "Game API",
+    "version": "1.0.0",
+    "description": "Node.js API for game events and players"
+}

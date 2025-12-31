@@ -1,10 +1,20 @@
 # Game API
-# Kokoonpano
+# Project structure
 - Docker
 - MariaDB
-- Node express
+- Node (24.12.0)
 
-# Testaaminen
-- supertest
+# Instructions
 
-# Käyttöönotto
+## Install depepdencies
+- Run `npm install`
+- Run `docker-compose up`
+
+## Api documentation
+- Run `npm run docs`
+- Run `open apidoc/index.html`
+
+## Testing
+- supertest (in proggress)
+- postman (Prefered way)
+- folder postman contains ready to use api calls for this project as Collection

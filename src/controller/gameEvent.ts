@@ -11,7 +11,7 @@ export const getGameEvents = async (req: Request, res: Response): Promise<void> 
         conn = await pool.getConnection();
         const gameEvents = await getGameEventsDB(conn);
         console.log('gameevents', gameEvents);
-        res.json({ data: gameEvents });
+        res.json({ events: gameEvents });
     } catch (error) {
         console.error('Error fetching game events:', error);
         res.status(500).json({ message: 'Failed to fetch game events' });
